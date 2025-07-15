@@ -1,0 +1,17 @@
+ # Gallery RDS Stack
+  GalleryRDSStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      - GalleryVPCStack
+      - GallerySecurityGroupsStack
+    Properties:
+      TemplateURL: !Sub "${TemplateS3BaseURL}/rds.yml"
+      Parameters:
+        AppName: !Ref AppName
+        LabTag: !Ref LabTag
+        VPCId: !GetAtt GalleryVPCStack.Outputs.VPCId
+        PrivateSubnet1: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet1Id
+        PrivateSubnet2: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet2Id
+        RdsSecurityGroup: !GetAtt GallerySecurityGroupsStack.Outputs.RdsSecurityGroup
+        RdsVPCEndpointSG: !GetAtt GallerySecurityGroupsStack.Outputs.RdsVPCEndpointSG
+        VPCEndpointSG: !GetAtt GalleryVPCStack.Outputs.VPCEndpointSG
