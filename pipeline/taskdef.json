@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "gallery-container",
-      "image": "124355655853.dkr.ecr.eu-west-1.amazonaws.com/wk5-gallery-app:latest",
+      "image": "124355655853.dkr.ecr.eu-west-1.amazonaws.com/wk6-gallery-app:latest",
       "portMappings": [
         {
           "containerPort": 8081,
@@ -41,7 +41,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/gallery",
+          "awslogs-group": "/ecs/gallery-v2",
           "awslogs-region": "eu-west-1",
           "awslogs-create-group": "true",
           "awslogs-stream-prefix": "ecs"
