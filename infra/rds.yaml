@@ -93,7 +93,7 @@ Resources:
       Value: !GetAtt RDSInstance.Endpoint.Address
       Description: RDS instance endpoint address
 
-  # Store the database name (static) in SSM
+  # Store the database name in SSM
   DBNameParam:
     Type: AWS::SSM::Parameter
     DependsOn: RDSInstance
@@ -103,7 +103,7 @@ Resources:
       Value: shutterboxdb
       Description: Database name stored in SSM
 
-  # Store the database port in SSM (typically 5432 for PostgreSQL)
+  # Store the database port in SSM
   DBPortParam:
     Type: AWS::SSM::Parameter
     Properties:

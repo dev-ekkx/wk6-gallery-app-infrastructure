@@ -97,7 +97,7 @@ Resources:
   GalleryRDSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${TemplateS3BaseURL}/rds.yml"
+      TemplateURL: !Sub "${TemplateS3BaseURL}/rds.yaml"
       Parameters:
         AppName: !Ref AppName
         LabTag: !Ref LabTag
