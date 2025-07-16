@@ -14,7 +14,7 @@ Parameters:
     Default: https://wk6-gallery-infra-bucket.s3.eu-west-1.amazonaws.com/infra/
   ECRImageUri:
     Type: String
-    Default: 124355655853.dkr.ecr.eu-west-1.amazonaws.com/gallery-repo:latest
+    Default: 124355655853.dkr.ecr.eu-west-1.amazonaws.com/gallery-v2-repo:latest
 
 Resources:
   # Gallery S3 Stack
