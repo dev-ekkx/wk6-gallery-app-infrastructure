@@ -93,6 +93,20 @@ Resources:
         CodeDeployApplication: !GetAtt GalleryCodeDeployStack.Outputs.CodeDeployAppName
         CodeDeployDeploymentGroup: !GetAtt GalleryCodeDeployStack.Outputs.CodeDeployDeploymentGroupName
 
+  # Gallery RDS Stack
+  GalleryRDSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${TemplateS3BaseURL}/rds.yml"
+      Parameters:
+        AppName: !Ref AppName
+        LabTag: !Ref LabTag
+        VPCId: !GetAtt GalleryVPCStack.Outputs.VPCId
+        PrivateSubnet1: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet1Id
+        PrivateSubnet2: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet2Id
+        RdsSecurityGroup: !GetAtt GallerySecurityGroupsStack.Outputs.RdsSecurityGroup
+        VPCEndpointSG: !GetAtt GalleryVPCStack.Outputs.VPCEndpointSG
+
 Outputs:
   LoadBalancerDNS:
     Description: Gallery ALB DNS to access app

@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Deploys a Multi-AZ RDS PostgreSQL instance with Secrets Manager integration, VPC endpoints for SSM, and stores DB connection details in SSM Parameter Store.
 
-# ----------------------------
 # Parameters
-# ----------------------------
 Parameters:
   AppName:
     Type: String
@@ -33,11 +31,8 @@ Parameters:
     Type: AWS::EC2::SecurityGroup::Id
     Description: Security group to use for the VPC Interface Endpoint
 
-# ----------------------------
 # Resources
-# ----------------------------
 Resources:
-
   # Secret for storing generated database credentials
   DBSecret:
     Type: AWS::SecretsManager::Secret
@@ -159,9 +154,7 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCEndpointSG
 
-# ----------------------------
 # Outputs
-# ----------------------------
 Outputs:
   RDSInstanceEndpoint:
     Description: DNS address of the RDS PostgreSQL instance
