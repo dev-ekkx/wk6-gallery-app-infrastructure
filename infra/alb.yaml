@@ -262,12 +262,17 @@ Resources:
               Value: !Ref PORT
             - Name: GIN_MODE
               Value: release
+            # - Name: DB_HOST
+            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/host:1}}"
+            # - Name: DB_PORT
+            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/port:1}}"
+            # - Name: DB_NAME
+            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/name:1}}"
           # Secrets:
-          #   - Name: AWS_ACCESS_KEY_ID
-          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/wk5-gallery-app/access-key
-          #   - Name: AWS_SECRET_ACCESS_KEY
-          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/wk5-gallery-app/secret_access
-         
+          #   - Name: DB_USERNAME
+          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/username
+          #   - Name: DB_PASSWORD
+          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/password
           LogConfiguration:
             LogDriver: awslogs
             Options:

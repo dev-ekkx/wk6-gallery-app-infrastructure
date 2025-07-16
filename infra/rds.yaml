@@ -1,17 +1,170 @@
- # Gallery RDS Stack
-  GalleryRDSStack:
-    Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - GalleryVPCStack
-      - GallerySecurityGroupsStack
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Deploys a Multi-AZ RDS PostgreSQL instance with Secrets Manager integration, VPC endpoints for SSM, and stores DB connection details in SSM Parameter Store.
+
+# ----------------------------
+# Parameters
+# ----------------------------
+Parameters:
+  AppName:
+    Type: String
+    Description: Name of the application (used for naming resources)
+
+  LabTag:
+    Type: String
+    Description: Tag to identify the lab or environment
+
+  VPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: ID of the VPC to deploy into
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID of the first private subnet
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: ID of the second private subnet (used for Multi-AZ)
+
+  RdsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security group to associate with the RDS instance
+
+  VPCEndpointSG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security group to use for the VPC Interface Endpoint
+
+# ----------------------------
+# Resources
+# ----------------------------
+Resources:
+
+  # Secret for storing generated database credentials
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
     Properties:
-      TemplateURL: !Sub "${TemplateS3BaseURL}/rds.yml"
-      Parameters:
-        AppName: !Ref AppName
-        LabTag: !Ref LabTag
-        VPCId: !GetAtt GalleryVPCStack.Outputs.VPCId
-        PrivateSubnet1: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet1Id
-        PrivateSubnet2: !GetAtt GalleryVPCStack.Outputs.PrivateSubnet2Id
-        RdsSecurityGroup: !GetAtt GallerySecurityGroupsStack.Outputs.RdsSecurityGroup
-        RdsVPCEndpointSG: !GetAtt GallerySecurityGroupsStack.Outputs.RdsVPCEndpointSG
-        VPCEndpointSG: !GetAtt GalleryVPCStack.Outputs.VPCEndpointSG
+      Name: !Sub ${AppName}-db-secret
+      Description: Automatically generated PostgreSQL credentials for RDS
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "sbdbadmin"}'
+        GenerateStringKey: password
+        PasswordLength: 12
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: App
+          Value: !Ref AppName
+        - Key: Lab
+          Value: !Ref LabTag
+
+  # Subnet group for deploying RDS across multiple AZs
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group used by the RDS instance for high availability
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-db-subnet-group
+        - Key: Lab
+          Value: !Ref LabTag
+
+  # Store DB username in SSM for downstream services
+  DBUsernameParam:
+    Type: AWS::SSM::Parameter
+    DependsOn: RDSInstance
+    Properties:
+      Name: !Sub /${AppName}/db/username
+      Type: String
+      Value: sbdbadmin
+      Description: Database username stored in SSM
+
+  # Store DB password in SSM securely using a Secrets Manager reference
+  DBPasswordParam:
+    Type: AWS::SSM::Parameter
+    DependsOn: RDSInstance
+    Properties:
+      Name: !Sub /${AppName}/db/password
+      Type: String
+      Value: !Sub "{{resolve:secretsmanager:${DBSecret}::password}}"
+      Description: Database password retrieved from Secrets Manager and stored in SSM
+
+  # Store DB endpoint in SSM so apps can discover it dynamically
+  DBHostParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AppName}/db/host
+      Type: String
+      Value: !GetAtt RDSInstance.Endpoint.Address
+      Description: RDS instance endpoint address
+
+  # Store the database name (static) in SSM
+  DBNameParam:
+    Type: AWS::SSM::Parameter
+    DependsOn: RDSInstance
+    Properties:
+      Name: !Sub /${AppName}/db/name
+      Type: String
+      Value: shutterboxdb
+      Description: Database name stored in SSM
+
+  # Store the database port in SSM (typically 5432 for PostgreSQL)
+  DBPortParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AppName}/db/port
+      Type: String
+      Value: !GetAtt RDSInstance.Endpoint.Port
+      Description: Port on which the RDS database is listening
+
+  # Main RDS PostgreSQL instance
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    Properties:
+      DBInstanceIdentifier: !Sub ${AppName}-db
+      Engine: postgres
+      EngineVersion: 15.8
+      DBInstanceClass: db.t3.micro 
+      MultiAZ: true 
+      DBName: shutterboxdb
+      MasterUsername: !Join ["", ["{{resolve:secretsmanager:", !Ref DBSecret, "::username}}"]]
+      MasterUserPassword: !Join ["", ["{{resolve:secretsmanager:", !Ref DBSecret, "::password}}"]]
+      VPCSecurityGroups:
+        - !Ref RdsSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      AllocatedStorage: 20
+      StorageEncrypted: true
+      BackupRetentionPeriod: 7
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+      PerformanceInsightsRetentionPeriod: 7
+      Tags:
+        - Key: Name
+          Value: !Sub ${AppName}-rds-instance
+        - Key: Lab
+          Value: !Ref LabTag
+
+  # VPC Interface Endpoint for SSM to allow access from private subnets
+  SSMEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ssm
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      PrivateDnsEnabled: true
+      SecurityGroupIds:
+        - !Ref VPCEndpointSG
+
+# ----------------------------
+# Outputs
+# ----------------------------
+Outputs:
+  RDSInstanceEndpoint:
+    Description: DNS address of the RDS PostgreSQL instance
+    Value: !GetAtt RDSInstance.Endpoint.Address
+    Export:
+      Name: !Sub ${AppName}-rds-endpoint
