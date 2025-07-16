@@ -4,7 +4,7 @@ Description: Root Stack for ECS Go and Angular Gallery App with S3, Auto Scaling
 Parameters:
   AppName:
     Type: String
-    Default: gallery
+    Default: gallery-v2
   LabTag:
     Type: String
     Default: week5_project

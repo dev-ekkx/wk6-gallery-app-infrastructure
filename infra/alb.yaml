@@ -131,6 +131,17 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:DescribeLogStreams
                 Resource: "*"
+        - PolicyName: !Sub ${AppName}-SSMAccessPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                Resource:
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/*
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/image-uri/
       Tags:
         - Key: Name
           Value: !Sub ${AppName}-task-exec-role
@@ -262,17 +273,17 @@ Resources:
               Value: !Ref PORT
             - Name: GIN_MODE
               Value: release
-            # - Name: DB_HOST
-            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/host:1}}"
-            # - Name: DB_PORT
-            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/port:1}}"
-            # - Name: DB_NAME
-            #   Value: !Sub "{{resolve:ssm:/${AppName}/db/name:1}}"
-          # Secrets:
-          #   - Name: DB_USERNAME
-          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/username
-          #   - Name: DB_PASSWORD
-          #     ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/password
+            - Name: DB_HOST
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/host:1}}"
+            - Name: DB_PORT
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/port:1}}"
+            - Name: DB_NAME
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/name:1}}"
+          Secrets:
+            - Name: DB_USERNAME
+              ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/username
+            - Name: DB_PASSWORD
+              ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/password
           LogConfiguration:
             LogDriver: awslogs
             Options:

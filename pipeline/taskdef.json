@@ -26,7 +26,7 @@
         },
         {
             "name": "S3_BUCKET_NAME",
-            "value": "week5-image-upload"
+            "value": "week6-image-upload"
         },
         {
             "name": "PORT",

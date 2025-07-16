@@ -5,5 +5,5 @@ Resources:
       Properties:
         TaskDefinition: "arn:aws:ecs:eu-west-1:124355655853:task-definition/gallery-task"
         LoadBalancerInfo:
-          ContainerName: "gallery-container"
+          ContainerName: "gallery-v2-container"
           ContainerPort: 8081
