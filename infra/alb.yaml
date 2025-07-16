@@ -98,18 +98,6 @@ Resources:
                   - ecr:ListImages
                   - ecr:DescribeImages
                 Resource: "*"
-        - PolicyName: !Sub ${AppName}-SSMAccessPolicy
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ssm:GetParameters
-                  - ssm:GetParameter
-                  - ssm:GetParametersByPath
-                  - secretsmanager:GetSecretValue
-                Resource:
-                  - !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/wk5-gallery-app/*"
-                  - !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*"
         - PolicyName: !Sub ${AppName}-S3AccessPolicy
           PolicyDocument:
             Statement:
@@ -141,7 +129,7 @@ Resources:
                   - ssm:GetParametersByPath
                 Resource:
                   - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/*
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/image-uri/
+                  # - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/image-uri/
       Tags:
         - Key: Name
           Value: !Sub ${AppName}-task-exec-role
@@ -274,11 +262,11 @@ Resources:
             - Name: GIN_MODE
               Value: release
             - Name: DB_HOST
-              Value: !Sub "{{resolve:ssm:/${AppName}/db/host:1}}"
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/host}}"
             - Name: DB_PORT
-              Value: !Sub "{{resolve:ssm:/${AppName}/db/port:1}}"
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/port}}"
             - Name: DB_NAME
-              Value: !Sub "{{resolve:ssm:/${AppName}/db/name:1}}"
+              Value: !Sub "{{resolve:ssm:/${AppName}/db/name}}"
           Secrets:
             - Name: DB_USERNAME
               ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/username
