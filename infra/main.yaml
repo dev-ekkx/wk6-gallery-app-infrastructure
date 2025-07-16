@@ -7,7 +7,7 @@ Parameters:
     Default: gallery-v2
   LabTag:
     Type: String
-    Default: week5_project
+    Default: week6_project
   TemplateS3BaseURL:
     Description: "S3 Base URL where templates are stored"
     Type: String
