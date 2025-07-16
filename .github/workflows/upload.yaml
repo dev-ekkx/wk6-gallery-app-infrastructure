@@ -1,4 +1,4 @@
-name: Upload Infra Templates and CodeDeploy Files to S3
+name: Upload Infrastructure Templates and CodeDeploy Files to S3
 
 on:
   push:
