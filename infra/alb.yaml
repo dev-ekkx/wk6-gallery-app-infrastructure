@@ -127,9 +127,9 @@ Resources:
                   - ssm:GetParameter
                   - ssm:GetParameters
                   - ssm:GetParametersByPath
+                  - kms:Decrypt
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/db/*
-                  # - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/image-uri/
+                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AppName}/*
       Tags:
         - Key: Name
           Value: !Sub ${AppName}-task-exec-role
