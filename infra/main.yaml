@@ -50,7 +50,7 @@ Resources:
   # Gallery ECS Application Stack
   GalleryECSAppStack:
     Type: AWS::CloudFormation::Stack
-    # DependsOn: GalleryRDSStack
+    DependsOn: GalleryRDSStack
     Properties:
       TemplateURL: !Sub "${TemplateS3BaseURL}/alb.yaml"
       Parameters:

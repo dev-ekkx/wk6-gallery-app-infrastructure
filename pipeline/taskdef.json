@@ -37,6 +37,16 @@
             "value": "release"
         }
       ],
+      "secrets": [
+        {
+          "name": "DB_USERNAME",
+          "valueFrom": "arn:aws:ssm:eu-west-1:124355655853:parameter/gallery-v2/db/username"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:ssm:eu-west-1:124355655853:parameter/gallery-v2/db/password"
+        }
+      ],
       "essential": true,
       "logConfiguration": {
         "logDriver": "awslogs",
