@@ -61,6 +61,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 5432
           ToPort: 5432
+          SourceSecurityGroupId: !Ref ECSSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
           SourceSecurityGroupId: !Ref VPCEndpointSG
       Tags:
         - Key: Name
