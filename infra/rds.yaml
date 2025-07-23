@@ -40,7 +40,7 @@ Resources:
       Name: !Sub ${AppName}-db-secret
       Description: Automatically generated PostgreSQL credentials for RDS
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "sbdbadmin"}'
+        SecretStringTemplate: '{"username": "delaricch"}'
         GenerateStringKey: password
         PasswordLength: 12
         ExcludeCharacters: '"@/\'
@@ -71,7 +71,7 @@ Resources:
     Properties:
       Name: !Sub /${AppName}/db/username
       Type: String
-      Value: sbdbadmin
+      Value: delaricch
       Description: Database username stored in SSM
 
   # Store DB password in SSM securely using a Secrets Manager reference
@@ -100,7 +100,7 @@ Resources:
     Properties:
       Name: !Sub /${AppName}/db/name
       Type: String
-      Value: shutterboxdb
+      Value: galleryV2Db
       Description: Database name stored in SSM
 
   # Store the database port in SSM
@@ -122,7 +122,7 @@ Resources:
       EngineVersion: 15.8
       DBInstanceClass: db.t3.micro 
       MultiAZ: true 
-      DBName: shutterboxdb
+      DBName: galleryV2Db
       MasterUsername: !Join ["", ["{{resolve:secretsmanager:", !Ref DBSecret, "::username}}"]]
       MasterUserPassword: !Join ["", ["{{resolve:secretsmanager:", !Ref DBSecret, "::password}}"]]
       VPCSecurityGroups:
