@@ -34,7 +34,7 @@
         },
         {
           "name": "DB_HOST",
-          "value": "shutter-box-db.cbk406e6wox5.eu-central-1.rds.amazonaws.com"
+          "value": "gallery-v2-db.cn8aem2220t7.eu-west-1.rds.amazonaws.com"
         },
         {
           "name": "DB_PORT",
