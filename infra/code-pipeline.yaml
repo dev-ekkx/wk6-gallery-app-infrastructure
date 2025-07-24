@@ -8,7 +8,7 @@ Parameters:
     Type: String
   InfraBucket:
     Type: String
-    Default: wk5-gallery-app-bucket
+    Default: wk6-gallery-infra-bucket
   CodeDeployApplication:
     Type: String
   CodeDeployDeploymentGroup:
